@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - Comedor Invisible</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="index.html" class="logo">Comedor Invisible</a>
+            <ul>
+                <li><a href="mapa.html">Ver Raciones</a></li>
+                <li><a href="publicar.html" id="publicar-link" class="hidden">Publicar Ración</a></li>
+                <li><a href="login.html" id="login-link">Iniciar Sesión</a></li>
+                <li><a href="usuario.html" id="user-link" class="hidden">Mi Perfil</a></li>
+                <li><a href="#" id="logout-link" class="hidden">Cerrar Sesión</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h2>Crear una cuenta</h2>
+        <form id="register-form">
+            <label for="name">Nombre</label>
+            <input type="text" id="name" required>
+
+            <label for="email">Email</label>
+            <input type="email" id="email" required>
+            
+            <label for="password">Contraseña</label>
+            <input type="password" id="password" required>
+            
+            <button type="submit" class="btn btn-primary">Registrarse</button>
+            <p>¿Ya tienes cuenta? <a href="login.html">Inicia Sesión</a></p>
+        </form>
+    </main>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

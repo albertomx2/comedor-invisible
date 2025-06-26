@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil - Comedor Invisible</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="index.html" class="logo">Comedor Invisible</a>
+            <ul>
+                <li><a href="mapa.html">Ver Raciones</a></li>
+                <li><a href="publicar.html" id="publicar-link" class="hidden">Publicar Ración</a></li>
+                <li><a href="login.html" id="login-link">Iniciar Sesión</a></li>
+                <li><a href="usuario.html" id="user-link" class="hidden">Mi Perfil</a></li>
+                <li><a href="#" id="logout-link" class="hidden">Cerrar Sesión</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h2>Mi Actividad</h2>
+        <div id="user-activity">
+            <h3>Raciones que he compartido</h3>
+            <ul id="shared-dishes"></ul>
+            <h3>Raciones que he reservado</h3>
+            <ul id="reserved-dishes"></ul>
+        </div>
+    </main>
+
+    <script src="js/main.js"></script>
+    <script src="js/data.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const sharedList = document.getElementById('shared-dishes');
+            const reservedList = document.getElementById('reserved-dishes');
+            const raciones = getRaciones(); // Asumimos que el usuario actual ha compartido todo
+            
+            raciones.forEach(racion => {
+                const li = document.createElement('li');
+                li.textContent = `${racion.nombre} - ${racion.recogido ? 'Recogido' : 'Disponible'}`;
+                sharedList.appendChild(li);
+            });
+
+            // Simulación de raciones reservadas
+            const li = document.createElement('li');
+            li.textContent = 'Paella de Mariscos - Reservada';
+            reservedList.appendChild(li);
+        });
+    </script>
+</body>
+</html>

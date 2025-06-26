@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Publicar Ración - Comedor Invisible</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="index.html" class="logo">Comedor Invisible</a>
+            <ul>
+                <li><a href="mapa.html">Ver Raciones</a></li>
+                <li><a href="publicar.html" id="publicar-link" class="hidden">Publicar Ración</a></li>
+                <li><a href="login.html" id="login-link">Iniciar Sesión</a></li>
+                <li><a href="usuario.html" id="user-link" class="hidden">Mi Perfil</a></li>
+                <li><a href="#" id="logout-link" class="hidden">Cerrar Sesión</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h2>Publicar una nueva ración</h2>
+        <form id="publish-form">
+            <label for="dish-name">Nombre del Plato</label>
+            <input type="text" id="dish-name" required>
+            
+            <label for="description">Descripción</label>
+            <textarea id="description" rows="4"></textarea>
+            
+            <label for="location">Ubicación (aproximada)</label>
+            <input type="text" id="location" placeholder="Ej: Cerca de Plaza Mayor, Madrid" required>
+            
+            <button type="submit" class="btn btn-primary">Publicar Ración</button>
+        </form>
+    </main>
+
+    <script src="js/main.js"></script>
+    <script src="js/data.js"></script>
+    <script>
+        document.getElementById('publish-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const newDish = {
+                id: Date.now(),
+                nombre: document.getElementById('dish-name').value,
+                descripcion: document.getElementById('description').value,
+                ubicacion: {
+                    lat: 40.415 + (Math.random() - 0.5) * 0.01, // Simulación cerca de Madrid
+                    lng: -3.707 + (Math.random() - 0.5) * 0.01
+                },
+                recogido: false
+            };
+            addRacion(newDish);
+            alert('¡Ración publicada con éxito!');
+            window.location.href = 'mapa.html';
+        });
+    </script>
+</body>
+</html>
