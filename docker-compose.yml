@@ -1,24 +1,26 @@
-version: '3.9'
-
-services:
+# docker-compose.yml
 # ──────────────────────────────────────────────────────────
+services:
+  # Django + Gunicorn
   backend:
     build: ./backend
     command: >
-      sh -c "python manage.py migrate &&
-             python manage.py collectstatic --noinput &&
-             gunicorn --config gunicorn_config.py core.wsgi:application"
+      sh -c "
+        python manage.py migrate &&
+        python manage.py collectstatic --noinput &&
+        gunicorn --config gunicorn_config.py core.wsgi:application
+      "
     env_file: .env
     volumes:
       - ./backend:/app
-      - static_volume:/app/static/
+      - static_volume:/app/staticfiles/      # STATIC_ROOT apunta aquí
     depends_on:
       - timescaledb
       - kafka
     expose:
       - "8000"
 
-# ──────────────────────────────────────────────────────────
+  # TimescaleDB (Postgres + extensión)
   timescaledb:
     image: timescale/timescaledb-ha:pg17
     restart: always
@@ -31,7 +33,7 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
-# ──────────────────────────────────────────────────────────
+  # Kafka stack (Zookeeper + broker)
   zookeeper:
     image: bitnami/zookeeper:3.9
     environment:
@@ -50,17 +52,18 @@ services:
     ports:
       - "9092:9092"
 
-# ──────────────────────────────────────────────────────────
+  # Reverse-proxy (desarrollo sin TLS)
   nginx:
     image: nginx:alpine
     ports:
       - "80:80"
     volumes:
-      - static_volume:/var/www/static/
+      - static_volume:/var/www/static/       # mismo volumen que usa collectstatic
       - ./nginx/conf.d/:/etc/nginx/conf.d/
     depends_on:
       - backend
 
+# ──────────────────────────────────────────────────────────
 volumes:
   static_volume:
   pgdata:
