@@ -32,15 +32,18 @@
             <label for="description">Descripción</label>
             <textarea id="description" rows="4"></textarea>
             
-            <label for="location">Ubicación (aproximada)</label>
-            <input type="text" id="location" placeholder="Ej: Cerca de Plaza Mayor, Madrid" required>
+            <label for="lat">Latitud</label>
+            <input type="number" id="lat" step="any" placeholder="40.4168" required>
+
+            <label for="lng">Longitud</label>
+            <input type="number" id="lng" step="any" placeholder="-3.7038" required>
+
             
             <button type="submit" class="btn btn-primary">Publicar Ración</button>
         </form>
     </main>
 
     <script src="js/main.js"></script>
-    <script src="js/data.js"></script>
     <script>
         document.getElementById('publish-form').addEventListener('submit', function(e) {
             e.preventDefault();

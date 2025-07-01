@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mi Perfil - Comedor Invisible</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="index.html" class="logo">Comedor Invisible</a>
+      <ul>
+        <li><a href="mapa.html">Ver Raciones</a></li>
+        <li><a href="publicar.html" id="publicar-link" class="hidden">Publicar Ración</a></li>
+        <li><a href="login.html" id="login-link">Iniciar Sesión</a></li>
+        <li><a href="usuario.html" id="user-link" class="hidden">Mi Perfil</a></li>
+        <li><a href="#" id="logout-link" class="hidden">Cerrar Sesión</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="container">
+    <h2>Mi Actividad</h2>
+    <div id="user-activity">
+      <h3>Raciones que he compartido</h3>
+      <ul id="shared-dishes"></ul>
+      <h3>Raciones que he reservado</h3>
+      <ul id="reserved-dishes"></ul>
+    </div>
+  </main>
+
+  <script src="js/main.js"></script>
+  <script>
+  document.addEventListener("DOMContentLoaded", async () => {
+    const token = localStorage.getItem("ci_access");
+    if (!token) {
+      alert("Debes iniciar sesión");
+      return window.location.href = "login.html";
+    }
+
+    const sharedList   = document.getElementById("shared-dishes");
+    const reservedList = document.getElementById("reserved-dishes");
+
+    // 1) Mis publicaciones
+    let res = await fetch("/api/dishes/mine/", {
+      headers: { Authorization: "Bearer " + token }
+    });
+    if (res.ok) {
+      (await res.json()).forEach(d => {
+        const li = document.createElement("li");
+        li.textContent = `${d.name} — Creado: ${new Date(d.created_at).toLocaleString()}`;
+        sharedList.appendChild(li);
+      });
+    }
+
+    // 2) Mis reservas
+    res = await fetch("/api/dishes/reserved/", {
+      headers: { Authorization: "Bearer " + token }
+    });
+    if (res.ok) {
+      (await res.json()).forEach(d => {
+        const li = document.createElement("li");
+        li.textContent = `${d.name} — Reservado: ${new Date(d.reserved_at).toLocaleString()}`;
+        reservedList.appendChild(li);
+      });
+    }
+  });
+  </script>
+</body>
+</html>

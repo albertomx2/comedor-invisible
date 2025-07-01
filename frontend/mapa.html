@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar Sesión - Comedor Invisible</title>
+    <title>Mapa de Raciones - Comedor Invisible</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
 </head>
 <body>
     <header>
@@ -24,19 +25,12 @@
     </header>
 
     <main class="container">
-        <h2>Iniciar Sesión</h2>
-        <form id="login-form">
-            <label for="email">Email</label>
-            <input type="email" id="email" required>
-            
-            <label for="password">Contraseña</label>
-            <input type="password" id="password" required>
-            
-            <button type="submit" class="btn btn-primary">Entrar</button>
-            <p>¿No tienes cuenta? <a href="register.html">Regístrate</a></p>
-        </form>
+        <h2>Raciones Disponibles</h2>
+        <div id="map"></div>
     </main>
 
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="js/map.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>

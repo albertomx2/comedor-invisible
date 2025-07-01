@@ -1,26 +1,30 @@
 # docker-compose.yml
-# ──────────────────────────────────────────────────────────
 services:
-  # Django + Gunicorn
+  # ──────────────────────────────────────────────────────────
   backend:
     build: ./backend
-    command: >
-      sh -c "
-        python manage.py migrate &&
-        python manage.py collectstatic --noinput &&
-        gunicorn --config gunicorn_config.py core.wsgi:application
-      "
     env_file: .env
     volumes:
       - ./backend:/app
-      - static_volume:/app/staticfiles/      # STATIC_ROOT apunta aquí
+      - static_volume:/app/staticfiles/
     depends_on:
       - timescaledb
       - kafka
     expose:
       - "8000"
+    command: >
+      sh -c "
+        echo '⏳ Esperando a TimescaleDB…';
+        until pg_isready -h ${POSTGRES_HOST} -p ${POSTGRES_PORT} -U ${POSTGRES_USER}; do
+          sleep 2;
+        done;
+        echo '✅ TimescaleDB lista. Migrando y arrancando Django';
+        python manage.py migrate &&
+        python manage.py collectstatic --noinput &&
+        gunicorn --config gunicorn_config.py core.wsgi:application
+      "
 
-  # TimescaleDB (Postgres + extensión)
+  # ──────────────────────────────────────────────────────────
   timescaledb:
     image: timescale/timescaledb-ha:pg17
     restart: always
@@ -33,7 +37,7 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
-  # Kafka stack (Zookeeper + broker)
+  # ──────────────────────────────────────────────────────────
   zookeeper:
     image: bitnami/zookeeper:3.9
     environment:
@@ -41,29 +45,29 @@ services:
 
   kafka:
     image: bitnami/kafka:3.7
+    depends_on:
+      - zookeeper
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_LISTENERS: PLAINTEXT://:9092
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       ALLOW_PLAINTEXT_LISTENER: "yes"
-    depends_on:
-      - zookeeper
     ports:
       - "9092:9092"
 
-  # Reverse-proxy (desarrollo sin TLS)
+  # ──────────────────────────────────────────────────────────
   nginx:
     image: nginx:alpine
     ports:
       - "80:80"
-    volumes:
-      - static_volume:/var/www/static/       # mismo volumen que usa collectstatic
-      - ./nginx/conf.d/:/etc/nginx/conf.d/
     depends_on:
       - backend
+    volumes:
+      - ./frontend:/usr/share/nginx/html
+      - static_volume:/var/www/static/
+      - ./nginx/conf.d/:/etc/nginx/conf.d/
 
-# ──────────────────────────────────────────────────────────
 volumes:
   static_volume:
   pgdata:
