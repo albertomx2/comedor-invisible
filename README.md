@@ -1,51 +1,63 @@
 # Comedor Invisible
 
- <!-- Opcional: Añade una captura de pantalla -->
+Prototipo de plataforma para compartir raciones de comida entre personas cercanas, con mapa, registro/inicio de sesión, publicación y reserva.
 
-**Comedor Invisible** es una aplicación web conceptual que simula una plataforma social para compartir comida cocinada sobrante de forma solidaria entre personas cercanas. El objetivo es reducir el desperdicio de alimentos y fortalecer los lazos comunitarios a través de la tecnología.
+## Estado y arquitectura
 
-Este proyecto es una **simulación frontend completa**, construida sin necesidad de un backend real, bases de datos o dependencias complejas. Es una demostración de cómo se puede prototipar una idea de aplicación web funcional y visualmente atractiva utilizando únicamente tecnologías web estándar.
+La revisión actual **ya no es solo una simulación frontend**: el JavaScript consulta `/api/auth/` y `/api/dishes/` y necesita Django para operar. Incluye Django REST Framework, JWT, PostgreSQL/TimescaleDB y Nginx. Compose también inicia Kafka y Zookeeper, aunque eso no demuestra que exista un flujo completo de eventos.
 
-## 🎯 Características Principales
+## Ejecutar el conjunto local
 
-- **Visualización en Mapa**: Las raciones disponibles se muestran en un mapa interactivo (usando Leaflet.js) con marcadores que indican la ubicación.
-- **Publicación de Raciones**: Los usuarios "logueados" pueden publicar nuevas raciones a través de un formulario simple.
-- **Simulación de Sesión**: El estado de inicio de sesión se gestiona con `localStorage` para mostrar u ocultar contenido dinámicamente (como los enlaces de "Publicar" y "Mi Perfil").
-- **Persistencia de Datos Simulada**: Los datos de las raciones se guardan en `localStorage`, por lo que persisten entre sesiones en el mismo navegador.
-- **Diseño Moderno y Responsive**: La interfaz está diseñada con una estética "dark mode", minimalista y se adapta a dispositivos móviles.
+Necesitas Docker y Docker Compose. El puerto 80 del host debe estar libre; también se publican 5432 y 9092. Estos puertos no deben quedar abiertos a Internet.
 
-## 🛠️ Tecnologías Utilizadas
+```bash
+git clone https://github.com/albertomx2/comedor-invisible.git
+cd comedor-invisible
+```
 
-- **HTML5**: Para la estructura semántica del contenido.
-- **CSS3**: Para el diseño visual, incluyendo Flexbox y un enfoque mobile-first.
-- **JavaScript (Vanilla)**: Para toda la lógica de la aplicación, manipulación del DOM y gestión de eventos.
-- **Leaflet.js**: Una biblioteca de mapas interactivos de código abierto.
-- **Google Fonts**: Para una tipografía moderna y limpia (Poppins).
+Crea `.env` en la raíz con valores de desarrollo privados:
 
-## 🚀 Cómo Ejecutar el Proyecto
+```dotenv
+SECRET_KEY=reemplaza_por_un_valor_largo_y_aleatorio
+DEBUG=True
+ALLOWED_HOSTS=localhost,127.0.0.1
+POSTGRES_DB=comedor
+POSTGRES_USER=comedor
+POSTGRES_PASSWORD=reemplaza_por_una_clave_unica
+POSTGRES_HOST=timescaledb
+POSTGRES_PORT=5432
+```
 
-Al ser un proyecto basado únicamente en ficheros estáticos, no requiere instalación de dependencias.
+```bash
+docker compose config --quiet
+docker compose up -d --build
+docker compose ps
+docker compose logs --tail=50 backend
+```
 
-1.  **Clona el repositorio (o descarga el ZIP):**
-    ```bash
-    git clone https://github.com/albertomx2/comedor-invisible.git
-    ```
+Abre http://localhost. Compose espera a PostgreSQL, aplica migraciones y recoge estáticos antes de iniciar Gunicorn. Si una imagen antigua de Bitnami no está disponible, habrá que revisar y actualizar esa parte de Compose: esta documentación no garantiza que todas las imágenes sigan publicadas.
 
-2.  **Navega a la carpeta del proyecto:**
-    ```bash
-    cd comedor-invisible
-    ```
+Para crear una cuenta de administración:
 
-3.  **Inicia un servidor web local:**
-    La forma más sencilla es usar la extensión **Live Server** en Visual Studio Code. Alternativamente, puedes usar el módulo `http.server` de Python:
-    ```bash
-    python -m http.server
-    ```
-    O si tienes Node.js:
-    ```bash
-    npx serve
-    ```
+```bash
+docker compose exec backend python manage.py createsuperuser
+```
 
-4.  **Abre tu navegador** y visita `http://localhost:8000` (o el puerto que indique tu servidor).
+## Datos y estructura
 
-¡Y listo! Ya puedes explorar y probar la aplicación.
+`frontend/` contiene páginas, CSS y JavaScript; `backend/users` y `backend/dishes` implementan usuarios y raciones; `nginx/conf.d` enruta estáticos y API. Las ubicaciones del mapa pueden revelar direcciones personales.
+
+La base persiste en el volumen `pgdata`. `docker compose down` para el conjunto; **`down -v` borra volúmenes y datos**. Guardar la base y la configuración en copias privadas.
+
+## Verificar
+
+```bash
+docker compose exec backend python manage.py check
+docker compose exec backend python manage.py test
+```
+
+Después prueba registro, login, publicación y reserva en dos sesiones con datos ficticios. Tener archivos de tests no implica cobertura completa ni pruebas exitosas.
+
+## Límites y seguridad
+
+JWT se guarda en almacenamiento del navegador; CORS está abierto en la configuración actual y el entorno de ejemplo usa DEBUG. Antes de producción: cerrar CORS, revisar autenticación, permisos, validación, HTTPS, abuso y tratamiento de ubicaciones. Leaflet, mapas y fuentes usan recursos externos. No se ha desplegado ni certificado para uso real o seguridad alimentaria.
